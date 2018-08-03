@@ -1,5 +1,3 @@
-dist: trusty
-language: python
 cache:
   pip: true
   directories:
@@ -29,21 +27,24 @@ addons:
 
 matrix:
   include:
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    #   language: python
+    #   python: "3.5"
     - os: linux
-      sudo: required
-      language: python
-      python: "3.5"
-    - os: linux
+      dist: trusty
       sudo: required
       language: python
       python: "3.6"
     - os: linux
+      dist: xenial
       sudo: required
       language: python
-      python: "3.7-dev"
-    - os: osx
-      osx_image: xcode8
-      language: generic
+      python: "3.7"
+    # - os: osx
+    #   osx_image: xcode8
+    #   language: generic
 
 before_cache:
 - rm -f $HOME/.cache/pip/log/debug.log
