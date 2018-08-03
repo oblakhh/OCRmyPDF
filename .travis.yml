@@ -3,28 +3,6 @@ cache:
   directories:
   - $HOME/Library/Caches/Homebrew
 
-addons:
-  apt:
-    update: true
-    sources:
-    - sourceline: 'ppa:alex-p/tesseract-ocr'
-    - sourceline: 'ppa:heyarje/libav-11'
-    - sourceline: 'ppa:vshn/ghostscript'
-    packages:
-    - ghostscript
-    - libavcodec56
-    - libavformat56
-    - libavutil54
-    - libexempi3
-    - libffi-dev
-    - pngquant
-    - poppler-utils
-    - qpdf
-    - tesseract-ocr
-    - tesseract-ocr-deu
-    - tesseract-ocr-eng
-    - tesseract-ocr-fra
-
 matrix:
   include:
     # - os: linux
@@ -37,11 +15,49 @@ matrix:
       sudo: required
       language: python
       python: "3.6"
+      addons:
+        apt:
+          update: true
+          sources:
+          - sourceline: 'ppa:alex-p/tesseract-ocr'
+          - sourceline: 'ppa:heyarje/libav-11'
+          - sourceline: 'ppa:vshn/ghostscript'
+          packages:
+          - ghostscript
+          - libavcodec56
+          - libavformat56
+          - libavutil54
+          - libexempi3
+          - libffi-dev
+          - pngquant
+          - poppler-utils
+          - qpdf
+          - tesseract-ocr
+          - tesseract-ocr-deu
+          - tesseract-ocr-eng
+          - tesseract-ocr-fra
     - os: linux
       dist: xenial
       sudo: required
       language: python
       python: "3.7"
+      addons:
+        apt:
+          update: true
+          sources:
+          - sourceline: 'ppa:alex-p/tesseract-ocr'
+          packages:
+          - ghostscript
+          - libexempi3
+          - libffi-dev
+          - pngquant
+          - poppler-utils
+          - qpdf
+          - tesseract-ocr
+          - tesseract-ocr-deu
+          - tesseract-ocr-eng
+          - tesseract-ocr-fra
+          - unpaper
     # - os: osx
     #   osx_image: xcode8
     #   language: generic
