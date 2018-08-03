@@ -10,12 +10,17 @@ matrix:
     #   sudo: required
     #   language: python
     #   python: "3.5"
+        # env:
+        # - DIST=trusty
+    #   addons: *trusty_apt
     - os: linux
       dist: trusty
       sudo: required
       language: python
       python: "3.6"
-      addons:
+      env:
+        - DIST=trusty
+      addons: &trusty_apt
         apt:
           update: true
           sources:
@@ -41,6 +46,8 @@ matrix:
       sudo: required
       language: python
       python: "3.7"
+      env:
+        - DIST=xenial
       addons:
         apt:
           update: true
@@ -70,9 +77,11 @@ before_install: |
   if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     pip3 install --upgrade pip
     pip3 install --upgrade wheel
-    mkdir -p packages
-    wget -q 'https://www.dropbox.com/s/vaq0kbwi6e6au80/unpaper_6.1-1.deb?raw=1' -O packages/unpaper_6.1-1.deb
-    sudo dpkg -i packages/unpaper_6.1-1.deb
+    if [[ "$DIST" == "trusty" ]]; then
+      mkdir -p packages
+      wget -q 'https://www.dropbox.com/s/vaq0kbwi6e6au80/unpaper_6.1-1.deb?raw=1' -O packages/unpaper_6.1-1.deb
+      sudo dpkg -i packages/unpaper_6.1-1.deb
+    fi
   elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update && brew bundle --file=.travis/Brewfile
     pip3 install --upgrade pip
