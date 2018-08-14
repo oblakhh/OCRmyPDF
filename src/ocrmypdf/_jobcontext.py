@@ -41,6 +41,7 @@ class JobContext:
         self.options = None
         self.work_folder = None
         self.rotations = {}
+        self.post_rotations = {}
 
     def generate_pdfinfo(self, infile):
         self.pdfinfo = PdfInfo(infile)
@@ -69,6 +70,12 @@ class JobContext:
 
     def set_rotation(self, pageno, value):
         self.rotations[pageno] = value
+
+    def get_post_rotation(self, pageno):
+        return self.post_rotations.get(pageno, 0)
+
+    def set_post_rotation(self, pageno, value):
+        self.post_rotations[pageno] = value
 
 
 class JobContextManager(SyncManager):

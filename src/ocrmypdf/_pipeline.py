@@ -40,6 +40,7 @@ from . import leptonica
 from . import PROGRAM_NAME, VERSION
 from .optimize import optimize
 from ._weave import weave_layers
+from ._hocranalyze import hocr_post_orient_page
 
 
 VECTOR_PAGE_DPI = 400
@@ -710,12 +711,17 @@ def ocr_tesseract_textonly_pdf(
 
     output_pdf = next((ii for ii in outfiles if ii.endswith('.pdf')))
     output_text = next((ii for ii in outfiles if ii.endswith('.txt')))
+    output_hocr = None
+
+    if options.rotate_pages_using_text:
+        output_hocr = next((ii for ii in outfiles if ii.endswith('.hocr')))
 
     tesseract.generate_pdf(
         input_image=input_image,
         skip_pdf=None,
         output_pdf=output_pdf,
         output_text=output_text,
+        output_hocr=output_hocr,
         language=options.language,
         engine_mode=options.tesseract_oem,
         text_only=True,
@@ -725,6 +731,29 @@ def ocr_tesseract_textonly_pdf(
         user_words=options.user_words,
         user_patterns=options.user_patterns,
         log=log)
+
+    #
+    # I failed implementing this in a separate task because of obvious lack of knowledge,
+    # so I've put it here temporarily
+    # todo: move to separate ruffus task
+    orient_page_using_hocr(output_hocr, log, context)
+
+
+def orient_page_using_hocr(
+        input_hocr,
+        log,
+        context):
+    """
+    Detects the page orientation
+    :param input_hocr:
+    :param log:
+    :param context:
+    """
+    options = context.get_options()
+
+    if options.rotate_pages_using_text:
+        pageno = page_number(input_hocr) - 1
+        hocr_post_orient_page(input_hocr, pageno, context, log)
 
 
 def get_pdfmark(base_pdf, options):
@@ -1016,15 +1045,29 @@ def build_pipeline(options, work_folder, log, context):
         input=[task_select_ocr_image],
         filter=regex(r".*/(\d{6})(?:\.ocr.png)"),
         output=[os.path.join(work_folder, r'\1.text.pdf'),
-                os.path.join(work_folder, r'\1.text.txt')],
+                os.path.join(work_folder, r'\1.text.txt'),
+                os.path.join(work_folder, r'\1.text.hocr')],
         extras=[log, context])
     task_ocr_tesseract_textonly_pdf.graphviz(fillcolor='"#ff69b4"')
     task_ocr_tesseract_textonly_pdf.active_if(options.pdf_renderer == 'sandwich')
+
+    # todo: implement ruffus task
+    # task_orient_page_using_hocr = main_pipeline.collate(
+    #     task_func=orient_page_using_hocr,
+    #     input=[task_ocr_tesseract_textonly_pdf],
+    #     filter=regex(r".*/(\d{6})(?:\.text\.hocr)"),
+    #     output=[os.path.join(work_folder, r'\1.text.pdf'),
+    #             os.path.join(work_folder, r'\1.text.txt'),
+    #             os.path.join(work_folder, r'\1.text.hocr')],
+    #     extras=[log, context])
+    # task_orient_page_using_hocr.graphviz(fillcolor='"#ff69b4"')
+    # task_orient_page_using_hocr.active_if(options.rotate_pages_using_text)
 
     task_weave_layers = main_pipeline.collate(
         task_func=weave_layers,
         input=[task_repair_and_parse_pdf,
                task_render_hocr_page,
+               # task_orient_page_using_hocr,
                task_ocr_tesseract_textonly_pdf,
                task_select_image_layer],
         filter=regex(

@@ -26,7 +26,6 @@ import atexit
 import textwrap
 import logging
 import argparse
-
 import PIL
 
 import ruffus.ruffus_exceptions as ruffus_exceptions
@@ -45,7 +44,7 @@ from .exceptions import ExitCode, ExitCodeException, MissingDependencyError, \
     InputFileError, BadArgsError, OutputFileAccessError
 from . import exceptions as ocrmypdf_exceptions
 from ._unicodefun import verify_python3_env
-
+                       
 
 # -------------
 # External dependencies
@@ -357,6 +356,10 @@ advanced.add_argument(
 advanced.add_argument(
     '--user-patterns', metavar='FILE',
     help="Specify the location of the Tesseract user patterns file.")
+
+advanced.add_argument(
+    '--rotate-pages-using-text', action='store_true',
+    help="Rotates the page after OCR by looking at the dominant text orientation")
 
 debugging = parser.add_argument_group(
     "Debugging",

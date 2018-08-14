@@ -294,7 +294,7 @@ def use_skip_page(text_only, skip_pdf, output_pdf, output_text):
         out.write(b'')
 
 
-def generate_pdf(*, input_image, skip_pdf=None, output_pdf, output_text,
+def generate_pdf(*, input_image, skip_pdf=None, output_pdf, output_text, output_hocr,
                  language: list, engine_mode, text_only: bool,
                  tessconfig: list, timeout: float, pagesegmode: int,
                  user_words, user_patterns, log):
@@ -304,6 +304,7 @@ def generate_pdf(*, input_image, skip_pdf=None, output_pdf, output_text,
     skip_pdf -- if we time out, use this file as output
     output_pdf -- file to generate
     output_text -- OCR text file
+    output_hocr -- OCR hocr file, if needed
     language -- list of languages to consider
     engine_mode -- engine mode argument for tess v4
     text_only -- enable tesseract text only mode?
@@ -330,13 +331,19 @@ def generate_pdf(*, input_image, skip_pdf=None, output_pdf, output_text,
 
     # Reminder: test suite tesseract spoofers might break after any changes
     # to the number of order parameters here
+    # todo: fix potentially broken test suite tesseract spoofers
 
-    args_tesseract.extend([
+    args_files = [
         input_image,
         prefix,
         'pdf',
         'txt'
-    ] + tessconfig)
+    ]
+
+    if output_hocr is not None:
+        args_files.append('hocr')
+
+    args_tesseract.extend(args_files + tessconfig)
 
     try:
         log.debug(args_tesseract)

@@ -292,6 +292,15 @@ def weave_layers(
         if replacing:
             content_rotation = autorotate_correction
         text_rotation = autorotate_correction
+
+        # Override rotation if post_rotation is present
+        # todo: don't brute force post_rotation
+        # but actually consider prior results to do the right thing in any case
+        postrotate_correction = context.get_post_rotation(page_num - 1)
+        if postrotate_correction:
+            content_rotation = postrotate_correction
+            text_rotation = postrotate_correction
+
         text_misaligned = (text_rotation - content_rotation) % 360
         log.debug('%r', [
             text_rotation, autorotate_correction, text_misaligned,
