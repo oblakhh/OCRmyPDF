@@ -27,9 +27,7 @@ def hocr_post_orient_page(input_hocr: str, page_index: int, context, log):
     symbols_by_angle = {}
     symbols_total = 0
 
-    input_file = None
-    try:
-        input_file = open(input_hocr, "r")
+    with open(input_hocr, "r") as input_file:
         angle_regex = re.compile(r'textangle (\d+);')
         word_regex = re.compile(r'(?<=>)([^<\s]+)(?=<)')
         symbol_regex = re.compile(r'(?![0-9_])\w')
@@ -72,7 +70,7 @@ def hocr_post_orient_page(input_hocr: str, page_index: int, context, log):
             if ratio > hocr_post_orient_page_threshold:
                 rotation = max(0, min(360, prevalent_angle[0]))
                 if rotation != existing_rotation:
-                    log.info("%4d: existing page rotation is %d°, content based rotation detected %d° (p=%.02f), "
+                    log.info("%4d: existing page rotation is %d°, content based rotation detected %d° (q=%.02f), "
                              "will change orientation" %
                              (page_num, _correction_to_rotation(existing_rotation), _correction_to_rotation(rotation), ratio))
                     
@@ -80,7 +78,3 @@ def hocr_post_orient_page(input_hocr: str, page_index: int, context, log):
 
         else:
             log.info("%4d: page seems not to have any readable text" % page_num)
-
-    finally:
-        if input_file is not None:
-            input_file.close()
